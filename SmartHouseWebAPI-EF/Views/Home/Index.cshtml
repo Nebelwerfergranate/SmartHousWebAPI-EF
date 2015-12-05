@@ -1,0 +1,379 @@
+﻿@using SmartHouse
+@model System.Collections.Generic.IDictionary<uint, Device>
+@{
+    Layout = null;
+    // ViewBag props
+    // microwaveNames
+    // ovenNames
+    // fridgeNames
+}
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-basic-width" />
+    <title>Smart House MVC</title>
+    <link rel="stylesheet" href="../../Content/Css/SmartHouseMVC.css" />
+    <script src="~/Scripts/jquery-2.1.4.min.js"></script>
+    <script src="~/Scripts/jquery-ui.min.js"></script>
+    <script src="~/Scripts/jquery.cookie.js"></script>
+    <script src="~/Scripts/jquery.scrollTo.js"></script>
+    <script src="~/Scripts/jquery.myClock.js"></script>
+    <script src="~/Scripts/script.js"></script>
+</head>
+<body>
+
+    <!--
+    // Данные Css id и классы используются для работы скриптов.
+    // Их переименование обязательно должно быть синхронизировано с серверным кодом
+    //
+    // #clock-dialog
+    // #microwave-dialog
+    // #oven-dialog
+    // #fridge-dialog
+    // #rename-dialog
+    // #renameId
+    // #newName
+    //
+    // .js_IClockDiv
+    // .js_DynamicClockDiv
+    // .js_Timestamp
+
+        -->
+
+    <div>
+        <div class="add-device-panel">
+            @CreateDevicePanelItem("../../Content/Images/clock.png", "clock-dialog")
+            @CreateDevicePanelItem("../../Content/Images/microwave.png", "microwave-dialog")
+            @CreateDevicePanelItem("../../Content/Images/oven.png", "oven-dialog")
+            @CreateDevicePanelItem("../../Content/Images/fridge.png", "fridge-dialog")
+        </div>
+
+        <div class="all-devices-container">
+            @foreach (KeyValuePair<uint, Device> pair in Model)
+            {
+                @CreateDevice(pair.Key, pair.Value)
+            }
+        </div>
+        <!-- hidden -->
+        @CreateDeviceDialog("clock-dialog", "clock")
+        @CreateDeviceDialog("microwave-dialog", "microwave", ViewBag.microwaveNames)
+        @CreateDeviceDialog("oven-dialog", "oven", ViewBag.ovenNames)
+        @CreateDeviceDialog("fridge-dialog", "fridge", ViewBag.fridgeNames)
+
+        @CreateRenameDialog("rename-dialog")
+        <!-- end hidden -->
+    </div>
+</body>
+</html>
+
+@helper CreateDevicePanelItem(string src, string dialogId)
+{
+    <div>
+        <div class="image">
+            <img src="@src" />
+        </div>
+        <div class="add-device-control">
+            <input type="button" value="Add" onclick="openDialog('@dialogId')" />
+        </div>
+    </div>
+}
+
+@helper CreateDevice(uint deviceId, Device device)
+{
+    <div class="device-container">
+        <div class="device-basic">
+            <!-- device-basic -->
+            <div class="device-control">
+                <a href="/Home/ToogleDevice?id=@deviceId">
+                    @if (device.IsOn)
+                    {
+                        <img src="~/Content/Images/on.png" alt="Toggle" class="toogle-button" />
+                    }
+                    else
+                    {
+                        <img src="~/Content/Images/off.png" alt="Toggle" class="toogle-button" />
+                    }
+                </a>
+                <a href="/Home/RemoveDevice?id=@deviceId"><img src="~/Content/Images/remove.png" alt="Remove" class="rename-button" /></a>
+                <input type="image" src="~/Content/Images/rename.png" alt="Rename" onclick="rename(@deviceId, '@device.Name')"
+                       class="remove-button" title="Rename device" />
+            </div>
+            <div class="device-name">
+                <span id="Name" class="device-name-label">@device.Name</span>
+            </div>
+            <div class="image">
+                @if (device is Clock)
+                {
+                    <img src="~/Content/Images/clock.png" alt="clock" />
+                }
+                else if (device is Microwave)
+                {
+                    <img src="~/Content/Images/microwave.png" alt="microwave" />
+                }
+                else if (device is Oven)
+                {
+                    <img src="~/Content/Images/oven.png" alt="oven" />
+                }
+                else if (device is Fridge)
+                {
+                    <img src="~/Content/Images/fridge.png" alt="fridge" />
+                }
+            </div>
+        </div>
+        <!-- device-device-interfaces -->
+        <div class="device-interfaces">
+            <div class="device-interfaces-small">
+                <div>
+                    @if (device is IOpenable)
+                    {
+                        IOpenable door = (IOpenable)device;
+                        <!-- IOpenable -->
+                        <a href="/Home/ToogleDoor?id=@deviceId">
+                            @if (door.IsOpen)
+                            {
+                                <img src="~/Content/Images/opened.png" alt="Close" />
+                            }
+                            else
+                            {
+                                <img src="~/Content/Images/closed.png" alt="Open" />
+                            }
+                        </a>
+                    }
+                    @if (device is IBacklight)
+                    {
+                        IBacklight ibacklightObj = (IBacklight)device;
+                        <!-- IBacklight -->
+                        if (ibacklightObj.IsHighlighted)
+                        {
+                            <img src="~/Content/Images/backlightOn.png" alt="Backlight is on"
+                                 title="Lamp power: @ibacklightObj.LampPower W" />
+                        }
+                        else
+                        {
+                            <img src="~/Content/Images/backlightOff.png" alt="Backlight is off"
+                                 title="Lamp power: @ibacklightObj.LampPower W" />
+                        }
+                    }
+                </div>
+                @if (device is IVolume)
+                {
+                    IVolume ivolumeObj = (IVolume)device;
+                    <!-- IVolume -->
+                    <div class="ivolume">
+                        <span>Interior space: @ivolumeObj.Volume litres</span>
+                    </div>
+                }
+            </div>
+            @if (device is IClock)
+            {
+                <!-- IClock -->
+                <div class="js_IClockDiv iclock">
+                    @if (device.IsOn)
+                    {
+                        DateTime curTime = ((IClock)device).CurrentTime;
+                        // Convert current time to miliseconds
+                        string hiddenValue = (curTime.Hour * 60 * 60 * 1000 +
+                                           curTime.Minute * 60 * 1000 +
+                                           curTime.Second * 1000).ToString();
+                        <input type="hidden" class="js_Timestamp" value="@hiddenValue" />
+                    }
+                    else
+                    {
+                        string hiddenValue = "disabled";
+                        <input type="hidden" class="js_Timestamp" value="@hiddenValue" />
+                    }
+
+                    <div class="js_DynamicClockDiv"></div>
+
+                    @if (device.IsOn)
+                    {
+                        using (Html.BeginForm("SetTime", "Home", new { id = deviceId }, FormMethod.Post))
+                        {
+                            <input type="number" min="0" max="23"
+                                   name="hours" required="required" maxlength="2" />
+                            <span class="unselectable">:</span>
+                            <input type="number" min="0" max="59"
+                                   name="minutes" required="required" maxlength="2" />
+                            <input type="submit" value="Set Time" />
+                        }
+                    }
+                </div>
+            }
+            @if (device is ITemperature)
+            {
+                <!-- ITemperature -->
+                ITemperature itemperatureObj = (ITemperature)device;
+                string title = "Set value between " + itemperatureObj.MinTemperature + " and " + itemperatureObj.MaxTemperature;
+
+                <div class="itemperature">
+                    @using (Html.BeginForm("SetTemperature", "Home", new { id = deviceId }, FormMethod.Post))
+                    {
+                        <input type="number" maxlength="5" min="@itemperatureObj.MinTemperature"
+                               max="@itemperatureObj.MaxTemperature"
+                               value="@itemperatureObj.Temperature" name="temperature" required="required"
+                               title="@title" />
+                        <input type="submit" value="Set Temperature" />
+                    }
+                </div>
+            }
+            @if (device is ITimer)
+            {
+                if (device.IsOn)
+                {
+                  <!-- ITimer -->
+                    <div class="itimer">
+                        @using (Html.BeginForm("TimerSet", "Home", new { id = deviceId }, FormMethod.Post))
+                        {
+                            if (device is Microwave == false)
+                            {
+                                <input type="number" maxlength="2" min="0" max="23"
+                                       name="hours" />
+                                <span class="unselectable">:</span>
+                            }
+                            <input type="number" maxlength="2" min="0" max="59"
+                                   name="minutes" />
+                            <span class="unselectable">:</span>
+                            <input type="number" maxlength="2" min="0" max="59"
+                                   name="seconds" />
+                            <input type="submit" value="Set Timer" />
+                            <a href="/Home/ToogleTimer?id=@deviceId">
+                                @if (((ITimer)device).IsRunning)
+                                {
+                                    <img src="~/Content/Images/stop.png" alt="Running" />
+                                }
+                                else
+                                {
+                                    <img src="~/Content/Images/start.png" alt="Running" title="Don't forget to set the timer" />
+                                }
+                            </a>
+                        }
+                    </div>
+                }
+            }
+            @if (device is Fridge)
+            {
+                Fridge fridge = (Fridge)device;
+                <!-- Fridge -->
+                <div class="fridge">
+                    <!-- Coldstore -->
+                    <div>
+                        <div class="device-interfaces-small">
+                            <div>
+                                <!-- Open/CLose -->
+                                <a href="/Home/ToogleColdstoreDoor?id=@deviceId">
+                                    @if (fridge.ColdstoreIsOpen)
+                                    {
+                                        <img src="~/Content/Images/opened.png" alt="Close" />
+                                    }
+                                    else
+                                    {
+                                        <img src="~/Content/Images/closed.png" alt="Open" />
+                                    }
+                                </a>
+                                <!-- Backlight -->
+                                @if (fridge.ColdstoreIsHighlighted)
+                                {
+                                    <img src="~/Content/Images/backlightOn.png" alt="Backlight is on"
+                                         title="Lamp power: @fridge.ColdstoreLampPower W" />
+                                }
+                                else
+                                {
+                                    <img src="~/Content/Images/backlightOff.png" alt="Backlight is off"
+                                         title="Lamp power: @fridge.ColdstoreLampPower W" />
+                                }
+                            </div>
+                            <div class="ivolume">
+                                <!-- Volume -->
+                                <span>Interior space: @fridge.ColdstoreVolume litres</span>
+                            </div>
+                        </div>
+                        <!-- Temperature -->
+                        <div class="itemperature">
+                            @using (Html.BeginForm("SetColdstoreTemperature", "Home", new { id = deviceId }, FormMethod.Post))
+                            {
+                                string title = "Set value between " + fridge.ColdstoreMinTemperature +
+                                    " and " + fridge.ColdstoreMaxTemperature;
+                                <input type="number" maxlength="5" min="@fridge.ColdstoreMinTemperature"
+                                       max="@fridge.ColdstoreMaxTemperature"
+                                       value="@fridge.ColdstoreTemperature" name="temperature" required="required"
+                                       title="@title" />
+                                <input type="submit" value="Set Temperature" />
+                            }
+                        </div>
+                    </div>
+                    <!-- Freezer -->
+                    <div>
+                        <div class="device-interfaces-small">
+                            <div>
+                                <!-- Open/CLose -->
+                                <a href="/Home/ToogleFreezerDoor/?id=@deviceId">
+                                    @if (fridge.FreezerIsOpen)
+                                    {
+                                        <img src="~/Content/Images/opened.png" alt="Close" />
+                                    }
+                                    else
+                                    {
+                                        <img src="~/Content/Images/closed.png" alt="Open" />
+                                    }
+                                </a>
+                            </div>
+                            <div class="ivolume">
+                                <!-- Volume -->
+                                <span>Interior space: @fridge.FreezerVolume litres</span>
+                            </div>
+                        </div>
+                        <!-- Temperature -->
+                        <div class="itemperature">
+                            @using (Html.BeginForm("SetFreezerTemperature", "Home", new { id = deviceId }, FormMethod.Post))
+                            {
+                                string title = "Set value between " + fridge.FreezerMinTemperature +
+                                    " and " + fridge.FreezerMaxTemperature;
+                                <input type="number" maxlength="5" min="@fridge.FreezerMinTemperature"
+                                       max="@fridge.FreezerMaxTemperature"
+                                       value="@fridge.FreezerTemperature" name="temperature" required="required"
+                                       title="@title" />
+                                <input type="submit" value="Set Temperature" />
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@helper CreateDeviceDialog(string dialogId, string device, string[] items = null)
+{
+    <div id="@dialogId" class="hidden">
+        @using (Html.BeginForm("AddDevice", "Home", FormMethod.Post))
+        {
+            @Html.TextBox("name", null, new { autocomplete = "off" })
+            <input type="hidden" name="device" value="@device" />
+            if (items != null)
+            {
+                <select name="fabricator">
+                    @foreach (string item in items)
+                    {
+                        <option value="@item">@item</option>
+                    }
+                </select>
+            }
+            <input type="submit" value="Ок" />
+        }
+    </div>
+}
+
+@helper CreateRenameDialog(string dialogID)
+{
+    <div id="@dialogID" class="hidden">
+        @using (Html.BeginForm("RenameDevice", "Home", FormMethod.Post))
+        {
+            @Html.TextBox("newName", null, new { autocomplete = "off" })
+            <input type="hidden" id="renameId" name="id" />
+            <input type="submit" value="Ok" />
+        }
+    </div>
+}

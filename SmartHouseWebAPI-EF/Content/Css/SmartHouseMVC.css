@@ -1,0 +1,317 @@
+﻿body {
+    font-size: 20px;
+    color: #323232;
+    font-weight: bold;
+}
+
+.unselectable {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+a {
+    /* В ссылках во всём проекте лежат картинки */
+    color: transparent;
+}
+
+input[type="text"], input[type="submit"], input[type="button"], input[type="number"], button {
+    font-size: 15px;
+    color: #323232;
+    background: white;
+    border: 2px solid white;
+    border-radius: 6px;
+}
+
+body select {
+    font-size: 15px;
+    color: #323232;
+    background: white;
+    border: 2px solid white;
+    border-radius: 4px;
+}
+
+body input[type="submit"] {
+    cursor: pointer;
+}
+
+
+.add-device-panel {
+    width: 816px;
+    height: 204px;
+    position: relative;
+    margin: 0 auto 20px auto;
+}
+
+    .add-device-panel > div {
+        width: 200px;
+        height: 200px;
+        float: left;
+        border: 2px solid #323232;
+        background: #AAECF9 none repeat scroll 0% 0%;
+    }
+
+.image {
+    padding-left: 25px;
+    padding-right: 25px;
+    width: 150px;
+    height: 150px;
+}
+
+.add-device-control {
+    border-top: 2px solid #323232;
+    height: 50px;
+}
+
+    .add-device-control input[type="button"] {
+        width: 100px;
+        height: 30px;
+        position: relative;
+        top: 9px;
+        left: 50px;
+    }
+
+.all-devices-container {
+    width: 1108px;
+    position: relative;
+    margin: auto;
+}
+
+.device-container {
+    width: 511px;
+    height: 260px;
+    border: 2px solid #323232;
+    float: left;
+    margin: 10px;
+    background: #AAECF9 none repeat scroll 0% 0%;
+}
+
+    .device-container > .device-basic {
+        width: 200px;
+        height: 260px;
+        float: left;
+        border-right: 1px solid black;
+    }
+
+        .device-container > .device-basic > .device-control {
+            width: 200px;
+            height: 50px;
+            position: relative;
+        }
+
+        .device-container > .device-basic > .device-name {
+            width: 200px;
+            height: 42px;
+            margin: 0px;
+            padding: 4px 0px;
+            position: relative;
+        }
+
+            .device-container > .device-basic > .device-name > .device-name-label {
+                position: absolute;
+                top: 13px;
+                left: 20px;
+                width: 160px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-align: center;
+            }
+
+        .device-container > .device-basic > .device-control .toogle-button {
+            height: 30px;
+            width: 30px;
+            position: absolute;
+            top: 15px;
+            left: 20px;
+        }
+
+        .device-container > .device-basic > .device-control .rename-button {
+            position: absolute;
+            top: 15px;
+            left: 85px;
+            width: 30px;
+            height: 30px;
+        }
+
+        .device-container > .device-basic > .device-control .remove-button {
+            height: 30px;
+            width: 30px;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+        }
+
+    .device-container > .device-interfaces {
+        height: 250px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        padding: 5px;
+    }
+        /* IBacklight IOpenable */
+        .device-container > .device-interfaces .device-interfaces-small img {
+            position: relative;
+            margin-top: 5px;
+            margin-left: 66px;
+            width: 50px;
+            height: 50px;
+        }
+
+        /* IVolume */
+        .device-container > .device-interfaces .device-interfaces-small .ivolume {
+            display: table;
+            width: 300px;
+            height: 40px;
+        }
+
+            .device-container > .device-interfaces .device-interfaces-small .ivolume > span {
+                display: table-cell;
+                text-align: center;
+                vertical-align: middle;
+            }
+
+        /* IClock */
+        .device-container > .device-interfaces .iclock {
+            position: relative;
+            width: 300px;
+            height: 50px;
+        }
+
+            .device-container > .device-interfaces .iclock .jqclock {
+                float: left;
+                position: relative;
+                top: 9px;
+                text-align: center;
+                display: inline-block;
+                width: 80px;
+                margin-right: 15px;
+            }
+
+            .device-container > .device-interfaces .iclock .clocktime {
+                border: 2px solid white;
+                background: #323232;
+                padding: 5px;
+                font-size: 14px;
+                font-family: "Courier";
+                color: white;
+                display: block;
+            }
+
+            .device-container > .device-interfaces .iclock input[type="number"] {
+                margin-top: 12px;
+                width: 40px;
+            }
+
+            .device-container > .device-interfaces .iclock input[type="submit"] {
+                position: absolute;
+                top: 12px;
+                right: 0px;
+            }
+
+        /* ITemperature */
+        .device-container > .device-interfaces .itemperature {
+            position: relative;
+            width: 300px;
+            height: 50px;
+        }
+
+            .device-container > .device-interfaces .itemperature input[type="number"] {
+                position: absolute;
+                top: 12px;
+                left: 25px;
+                width: 80px;
+            }
+
+            .device-container > .device-interfaces .itemperature input[type="submit"] {
+                position: absolute;
+                top: 12px;
+                right: 25px;
+                width: 140px;
+            }
+
+        /* ITimer */
+        .device-container > .device-interfaces .itimer {
+            position: relative;
+            width: 300px;
+            height: 100px;
+        }
+
+            .device-container > .device-interfaces .itimer input[type="number"] {
+                margin-top: 15px;
+                width: 40px;
+            }
+
+                .device-container > .device-interfaces .itimer input[type="number"]:first-child {
+                    margin-left: 10px;
+                }
+
+            .device-container > .device-interfaces .itimer input[type="submit"] {
+                position: absolute;
+                top: 15px;
+                right: 10px;
+                width: 90px;
+            }
+
+            .device-container > .device-interfaces .itimer img {
+                position: absolute;
+                top: 50px;
+                left: 135px;
+            }
+
+.hidden {
+    display: none;
+}
+/* jq-ui dialog */
+.ui-dialog {
+    /*высота задаётся в атрибуте sytle, устанавливается при вызове $(#)dialog(), но пусть лучше будет здесь*/
+    height: 170px !important;
+    background: #AAECF9 none repeat scroll 0% 0%;
+    border: 2px solid #323232;
+}
+
+.ui-dialog-titlebar {
+    cursor: move;
+    text-align: center;
+}
+
+    .ui-dialog-titlebar > span {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 300px;
+    }
+
+.ui-dialog-titlebar-close {
+    width: 100px;
+    height: 30px;
+    position: absolute;
+    top: 125px;
+    left: 166px;
+}
+
+/* My */
+.ui-dialog-content > form > input[type=text] {
+    width: 196px;
+    height: 30px;
+    position: absolute;
+    left: 50px;
+    top: 34px;
+    padding: 0px;
+}
+
+.ui-dialog-content > form > select {
+    width: 200px;
+    height: 30px;
+    position: absolute;
+    top: 80px;
+    left: 50px;
+}
+
+.ui-dialog-content > form > input[type="submit"] {
+    width: 100px;
+    height: 30px;
+    position: absolute;
+    top: 125px;
+    left: 33px;
+}
+/********/
