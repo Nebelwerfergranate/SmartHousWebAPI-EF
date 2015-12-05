@@ -109,6 +109,7 @@
     <Content Include="Content\Images\start.png" />
     <Content Include="Content\Images\stop.png" />
     <Content Include="Global.asax" />
+    <Content Include="Scripts\api-script.js" />
     <Content Include="Scripts\jquery-2.1.4.min.js" />
     <Content Include="Scripts\jquery-ui.min.js" />
     <Content Include="Scripts\jquery.cookie.js" />
@@ -120,9 +121,11 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\SmartHouseController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\DeviceManager\DeviceWrapper.cs" />
     <Compile Include="Models\DeviceManager\FridgeInfo.cs" />
     <Compile Include="Models\DeviceManager\MicrowaveInfo.cs" />
     <Compile Include="Models\DeviceManager\OvenInfo.cs" />

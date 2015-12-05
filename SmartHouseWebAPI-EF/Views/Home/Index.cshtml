@@ -22,6 +22,7 @@
     <script src="~/Scripts/jquery.scrollTo.js"></script>
     <script src="~/Scripts/jquery.myClock.js"></script>
     <script src="~/Scripts/script.js"></script>
+    <script src="~/Scripts/api-script.js"></script>
 </head>
 <body>
 
@@ -51,7 +52,7 @@
             @CreateDevicePanelItem("../../Content/Images/fridge.png", "fridge-dialog")
         </div>
 
-        <div class="all-devices-container">
+        <div id="all-devices-container">
             @foreach (KeyValuePair<uint, Device> pair in Model)
             {
                 @CreateDevice(pair.Key, pair.Value)
@@ -97,9 +98,9 @@
                         <img src="~/Content/Images/off.png" alt="Toggle" class="toogle-button" />
                     }
                 </a>
-                <a href="/Home/RemoveDevice?id=@deviceId"><img src="~/Content/Images/remove.png" alt="Remove" class="rename-button" /></a>
+                <a href="/Home/RemoveDevice?id=@deviceId"><img src="~/Content/Images/remove.png" alt="Remove" class="remove-button" /></a>
                 <input type="image" src="~/Content/Images/rename.png" alt="Rename" onclick="rename(@deviceId, '@device.Name')"
-                       class="remove-button" title="Rename device" />
+                       class="rename-button" title="Rename device" />
             </div>
             <div class="device-name">
                 <span id="Name" class="device-name-label">@device.Name</span>

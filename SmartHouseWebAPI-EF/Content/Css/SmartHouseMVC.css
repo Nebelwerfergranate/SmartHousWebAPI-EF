@@ -71,7 +71,7 @@ body input[type="submit"] {
         left: 50px;
     }
 
-.all-devices-container {
+#all-devices-container {
     width: 1108px;
     position: relative;
     margin: auto;
