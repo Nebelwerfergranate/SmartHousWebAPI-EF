@@ -14,7 +14,8 @@
 		// Зададим список свойств и укажем для них значения по умолчанию. Если при вызове метода будут указаны пользовательские
 		// варианты некоторых из них, то они автоматически перепишут соответствующие значения по умолчанию.
 		options = $.extend({
-			timestamp: 0,
+		    timestamp: undefined,
+		    dateTime: undefined,
 			disabled: false
 		}, options);
 		
@@ -30,11 +31,18 @@
 				return;
 			}
 			
-			// В рамках этой задачи нужно просто отобразить время, которое приходит от сервера.
-			options.timestamp += new Date(options.timestamp).getTimezoneOffset() * 60 * 1000;
-						
+			if (options.timestamp != undefined) {
+			    // В рамках этой задачи нужно просто отобразить время, которое приходит от сервера.
+			    options.timestamp += new Date(options.timestamp).getTimezoneOffset() * 60 * 1000;
+			    var myTimeStamp = new Date(options.timestamp).getTime();
+			}
+			else if (options.dateTime != undefined) {
+                // При таком подходе нужное смещение уже указано и корректировать его не нужно. 
+			    var myTimeStamp = options.dateTime.getTime();
+			}
+			
 			var sysTimeStamp = new Date().getTime();
-			var myTimeStamp = new Date(options.timestamp).getTime();
+			
 			var delta = sysTimeStamp - myTimeStamp;
 						
 			clockInfoManager.registerNewClock(this, delta);

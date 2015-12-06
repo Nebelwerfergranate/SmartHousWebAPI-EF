@@ -40,20 +40,6 @@ function rename(deviceId, oldName) {
 $(document).ready(function () {
     window.scroll($.cookie("scrollLeft"), $.cookie("scrollTop"));
 
-    // IClock
-    $(".js_IClockDiv").each(function (index, value) {
-        var clockElement = $(value).find(".js_DynamicClockDiv:first");
-        var timestamp = $(value).find(".js_Timestamp:first").val();
-        var disabled = false;
-        if (timestamp == "disabled") {
-            disabled = true;
-        }
-        else {
-            timestamp = parseInt(timestamp);
-        }
-        $(clockElement).myClock({ "timestamp": timestamp, "disabled": disabled });
-    });
-
     $("#clock-dialog").dialog({ autoOpen: false, title: "Add new clock" });
     $("#microwave-dialog").dialog({ autoOpen: false, title: "Add new microwave" });
     $("#oven-dialog").dialog({ autoOpen: false, title: "Add new oven" });

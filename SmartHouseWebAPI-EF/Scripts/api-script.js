@@ -23,8 +23,9 @@ function test() {
 
                 var creator = new DeviceCreator(data.Id, data.Device, data.DeviceType, data.Interfaces);
                 var deviceBasic = creator.createDeviceBasic();
-                var deviceInterfacec = creator.createDeviceInterfaces();
+                var deviceInterfaces = creator.createDeviceInterfaces();
                 deviceContainer.appendChild(deviceBasic);
+                deviceContainer.appendChild(deviceInterfaces);
 
                 allDevicesContainer.appendChild(deviceContainer);
                 //alert(data);
@@ -40,12 +41,13 @@ function DeviceCreator(id, device, type, interfaces) {
     this.device = device;
     this.type = type;
     this.interfaces = interfaces;
+
     this.createDeviceBasic = function () {
         var deviceBasic = document.createElement("div");
         deviceBasic.classList.add("device-basic");
 
         var imageSrc = "";
-        if (this.device.IsOn == true) {
+        if (device.IsOn == true) {
             imageSrc = "src='/Content/Images/on.png'";
         }
         else {
@@ -53,31 +55,31 @@ function DeviceCreator(id, device, type, interfaces) {
         }
 
         var deviceImgSrc = "";
-        if (this.type == "SmartHouse.Clock") {
+        if (type == "SmartHouse.Clock") {
             deviceImgSrc = "src='/Content/Images/clock.png'";
         }
-        else if (this.type == "SmartHouse.Microwave") {
+        else if (type == "SmartHouse.Microwave") {
             deviceImgSrc = "src='/Content/Images/microwave.png'";
         }
-        else if (this.type == "SmartHouse.Oven") {
+        else if (type == "SmartHouse.Oven") {
             deviceImgSrc = "src='/Content/Images/oven.png'";
         }
-        else if (this.type == "SmartHouse.Fridge") {
+        else if (type == "SmartHouse.Fridge") {
             deviceImgSrc = "src='/Content/Images/fridge.png'";
         }
         $(deviceBasic).html(
             "<div class='device-control'>" +
-                "<a href='/Home/ToogleDevice?id=" + this.id + "'>" +
+                "<a href='/Home/ToogleDevice?id=" + id + "'>" +
                      "<img " + imageSrc + " alt='Toggle' class='toogle-button' />" +
                 "</a>" +
-                "<a href='/Home/RemoveDevice?id=" + this.id + "'>" +
+                "<a href='/Home/RemoveDevice?id=" + id + "'>" +
                     "<img src='/Content/Images/remove.png' alt='Remove' class='remove-button' />" +
                 "</a>" +
                 "<input type='image' src='/Content/Images/rename.png' alt='Rename'" +
                     "class='rename-button' title='Rename device' />" +
             "</div>" +
             "<div class='device-name'>" +
-                "<span class='device-name-label'>" + this.device.Name + "</span>" +
+                "<span class='device-name-label'>" + device.Name + "</span>" +
             "</div>" +
             "<div class='image'>" +
                 "<img " + deviceImgSrc + " alt='clock' />" +
@@ -86,99 +88,154 @@ function DeviceCreator(id, device, type, interfaces) {
 
         deviceBasic.getElementsByClassName("rename-button")[0].onclick = function (id, name) {
             return function () { rename(id, name); }
-        }(this.id, this.device.Name);
+        }(id, device.Name);
 
         return deviceBasic;
     }
+
     this.createDeviceInterfaces = function () {
         var deviceInterfaces = document.createElement("div");
         deviceInterfaces.classList.add("device-interfaces");
 
-        if (this.interfaces.indexOf("SmartHouse.IClock") != -1) {
-            alert("device is IClock!!!");
+        deviceInterfaces.appendChild(createSmallInterfaces());
+
+        if (interfaces.indexOf("SmartHouse.IClock") != -1) {
+            var iClockDiv = createIClock();
+            deviceInterfaces.appendChild(iClockDiv);
         }
+
+        return deviceInterfaces;
+    }
+
+    var createSmallInterfaces = function () {
+        var deviceInterfacesSmall = document.createElement("div");
+        deviceInterfacesSmall.classList.add("device-interfaces-small");
+
+        var divTop = document.createElement("div");
+        var smallInterfaces = "";
+        if (interfaces.indexOf("SmartHouse.IOpenable") != -1) {
+            smallInterfaces += createIOpenable();
+        }
+        if (interfaces.indexOf("SmartHouse.IBacklight") != -1) {
+            smallInterfaces += createIBacklight();
+        }
+        $(divTop).html(smallInterfaces);
+        deviceInterfacesSmall.appendChild(divTop);
+
+        if (interfaces.indexOf("SmartHouse.IVolume") != -1) {
+            var iVolumeDiv = createIVolume();
+            deviceInterfacesSmall.appendChild(iVolumeDiv);
+        }
+
+        return deviceInterfacesSmall;
+    }
+
+    // IBacklight
+    var createIBacklight = function () {
+        var imageSrc = "";
+        if (device.IsHighlighted == true) {
+            imageSrc = " src='/Content/Images/backlightOn.png' alt='Backlight is on'";
+        } else {
+            imageSrc = " src='/Content/Images/backlightOff.png' alt='Backlight is off'";
+        }
+        var iBacklight = "<img " + imageSrc + " title='Lamp power: " + device.LampPower + " W' />";
+        return iBacklight;
+    }
+
+    // IClock
+    var createIClock = function () {
+        var iClockDiv = document.createElement("div");
+        iClockDiv.classList.add("iclock");
+
+        // Такой формат Date() понимает
+        // 2015-12-06T00:56:12.0666202+02:00 
+        var time = new Date(device.CurrentTime);
+
+        var dynamicClockDiv = document.createElement("div");
+
+        if (device.IsOn == true) {
+            $(dynamicClockDiv).myClock({ "dateTime": time });
+            iClockDiv.appendChild(dynamicClockDiv);
+
+            var form = document.createElement("form");
+            form.action = "/Home/SetTime?id=" + id;
+            form.method = "Post";
+
+            var hours = document.createElement("input");
+            hours.type = "number";
+            hours.min = 0;
+            hours.max = 23;
+            hours.name = "hours";
+            hours.required = "required";
+            hours.maxLength = 2;
+
+            var separator = document.createElement("span");
+            separator.classList.add("unselectable");
+            separator.appendChild(document.createTextNode(" : "));
+
+            var minutes = document.createElement("input");
+            minutes.type = "number";
+            minutes.min = 0;
+            minutes.max = 59;
+            minutes.name = "minutes";
+            minutes.required = "required";
+            minutes.maxLength = 2;
+
+            var submit = document.createElement("input");
+            submit.type = "submit";
+            submit.value = "Set Time";
+
+            form.appendChild(hours);
+            form.appendChild(separator);
+            form.appendChild(minutes);
+            form.appendChild(submit);
+
+            iClockDiv.appendChild(form);
+        } else {
+            $(dynamicClockDiv).myClock({ "disabled": true });
+            iClockDiv.appendChild(dynamicClockDiv);
+        }
+
+        return iClockDiv;
+    }
+
+    // IOpenable
+    var createIOpenable = function () {
+        var imageSrc = "";
+        if (device.IsOpen == true) {
+            imageSrc = "src='/Content/Images/opened.png' alt='Close'";
+        } else {
+            imageSrc = "src='/Content/Images/closed.png' alt='Open'";
+        }
+        var iOpenable = "<a href='/Home/ToogleDoor?id=" + id + "'>" +
+                            "<img " + imageSrc + " />" +
+                        "</a>";
+        return iOpenable;
+    }
+
+    // ITemperature
+
+
+    // ITimer
+
+
+    // IVolume
+    var createIVolume = function () {
+        var iVolumeDiv = document.createElement("div");
+        iVolumeDiv.classList.add("ivolume");
+        $(iVolumeDiv).html(
+            "<span>" +
+                "Interior space: " + device.Volume + " litres" +
+            "</span>"
+        );
+        return iVolumeDiv;
     }
 }
 
 //        <!-- device-device-interfaces -->
 //        <div class="device-interfaces">
 //            <div class="device-interfaces-small">
-//                <div>
-//                    @if (device is IOpenable)
-//{
-//                        IOpenable door = (IOpenable)device;
-//<!-- IOpenable -->
-//<a href="/Home/ToogleDoor?id=@deviceId">
-//    @if (door.IsOpen)
-//{
-//    <img src="~/Content/Images/opened.png" alt="Close" />
-//    }
-//else
-//{
-//<img src="~/Content/Images/closed.png" alt="Open" />
-//}
-//</a>
-//}
-//                    @if (device is IBacklight)
-//{
-//    IBacklight ibacklightObj = (IBacklight)device;
-//    <!-- IBacklight -->
-//    if (ibacklightObj.IsHighlighted)
-//    {
-//        <img src="~/Content/Images/backlightOn.png" alt="Backlight is on"
-//        title="Lamp power: @ibacklightObj.LampPower W" />
-//        }
-//else
-//{
-//    <img src="~/Content/Images/backlightOff.png" alt="Backlight is off"
-//    title="Lamp power: @ibacklightObj.LampPower W" />
-//    }
-//}
-//                </div>
-//                @if (device is IVolume)
-//{
-//    IVolume ivolumeObj = (IVolume)device;
-//    <!-- IVolume -->
-//    <div class="ivolume">
-//        <span>Interior space: @ivolumeObj.Volume litres</span>
-//    </div>
-//}
-//</div>
-//            @if (device is IClock)
-//{
-//    <!-- IClock -->
-//    <div class="js_IClockDiv iclock">
-//        @if (device.IsOn)
-//    {
-//        DateTime curTime = ((IClock)device).CurrentTime;
-//        // Convert current time to miliseconds
-//        string hiddenValue = (curTime.Hour * 60 * 60 * 1000 +
-//                           curTime.Minute * 60 * 1000 +
-//                           curTime.Second * 1000).ToString();
-//        <input type="hidden" class="js_Timestamp" value="@hiddenValue" />
-//        }
-//else
-//{
-//            string hiddenValue = "disabled";
-//    <input type="hidden" class="js_Timestamp" value="@hiddenValue" />
-//    }
 
-//<div class="js_DynamicClockDiv"></div>
-
-//                    @if (device.IsOn)
-//                    {
-//                        using (Html.BeginForm("SetTime", "Home", new { id = deviceId }, FormMethod.Post))
-//                        {
-//                            <input type="number" min="0" max="23"
-//                            name="hours" required="required" maxlength="2" />
-//                     <span class="unselectable">:</span>
-//                     <input type="number" min="0" max="59"
-//                            name="minutes" required="required" maxlength="2" />
-//                     <input type="submit" value="Set Time" />
-//                     }
-//                    }
-//</div>
-//}
 //            @if (device is ITemperature)
 //{
 //    <!-- ITemperature -->
