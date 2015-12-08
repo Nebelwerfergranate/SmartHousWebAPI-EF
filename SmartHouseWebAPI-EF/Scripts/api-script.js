@@ -42,8 +42,60 @@ $(document).ready(function () {
     var testDiv = document.createElement("div");
     $(testDiv).html("<input type='button' value='text' onclick='test()' style='background: red; height: 40px; width: 120px'/>");
     document.body.appendChild(testDiv);
+
+    getAllDevices();
 });
 
+function getAllDevices() {
+    $.ajax({
+        url: "/api/SmartHouse",
+        type: "GET",
+        success: function(data) {
+            if (data != null) {
+                $(allDevicesContainer).html("");
+                for (var i = 0; i < data.length; i++) {
+                    var deviceContainer = document.createElement("div");
+                    deviceContainer.classList.add("device-container");
+
+                    var creator = new DeviceCreator(data[i].Id, data[i].Device, data[i].DeviceType, data[i].Interfaces);
+                    var deviceBasic = creator.createDeviceBasic();
+                    var deviceInterfacesDiv = creator.createDeviceInterfaces();
+                    deviceContainer.appendChild(deviceBasic);
+                    deviceContainer.appendChild(deviceInterfacesDiv);
+
+                    allDevicesContainer.appendChild(deviceContainer);
+                }
+            }
+        }
+    });
+}
+
+function addDevice(event) {
+    event.preventDefault();
+   
+    var form = $(event.target).closest("form")[0];
+    var device = form.device.value;
+    var name = form.name.value;
+    var fabricatorList = form.fabricator;
+    var fabricator = "";
+    if (fabricatorList != undefined) {
+        fabricator = fabricatorList.value;
+    }
+    
+    var formInfo = { Device: device, Name: name, Fabricator: fabricator };
+
+    $.ajax({
+        url: "/api/SmartHouse",
+        contentType: "application/json;charset=utf-8",
+        data: JSON.stringify(formInfo),
+        type: "POST",
+        success: function () {
+
+            getAllDevices();
+        }
+    });
+    closeAllDialogs();
+}
 
 function test() {
     var id = prompt("Enter device id", "");

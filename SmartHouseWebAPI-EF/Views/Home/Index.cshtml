@@ -55,7 +55,7 @@
         <div id="all-devices-container">
             @foreach (KeyValuePair<uint, Device> pair in Model)
             {
-                @CreateDevice(pair.Key, pair.Value)
+                //@CreateDevice(pair.Key, pair.Value)
             }
         </div>
         <!-- hidden -->
@@ -348,7 +348,7 @@
 
 @helper CreateDeviceDialog(string dialogId, string device, string[] items = null)
 {
-    <div id="@dialogId" class="hidden">
+    <div id="@dialogId" class="hidden js_Dialog">
         @using (Html.BeginForm("AddDevice", "Home", FormMethod.Post))
         {
             @Html.TextBox("name", null, new { autocomplete = "off" })
@@ -362,7 +362,7 @@
                     }
                 </select>
             }
-            <input type="submit" value="Ок" />
+            <input type="submit" value="Ок" onclick="addDevice(event);"/>
         }
     </div>
 }
