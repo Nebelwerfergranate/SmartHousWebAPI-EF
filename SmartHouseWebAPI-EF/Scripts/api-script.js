@@ -39,10 +39,7 @@ var allDevicesContainer;
 
 $(document).ready(function () {
     allDevicesContainer = document.getElementById("all-devices-container");
-    var testDiv = document.createElement("div");
-    $(testDiv).html("<input type='button' value='text' onclick='test()' style='background: red; height: 40px; width: 120px'/>");
-    document.body.appendChild(testDiv);
-
+   
     getAllDevices();
 });
 
@@ -50,19 +47,12 @@ function getAllDevices() {
     $.ajax({
         url: "/api/SmartHouse",
         type: "GET",
-        success: function(data) {
+        success: function (data) {
             if (data != null) {
                 $(allDevicesContainer).html("");
                 for (var i = 0; i < data.length; i++) {
-                    var deviceContainer = document.createElement("div");
-                    deviceContainer.classList.add("device-container");
-
                     var creator = new DeviceCreator(data[i].Id, data[i].Device, data[i].DeviceType, data[i].Interfaces);
-                    var deviceBasic = creator.createDeviceBasic();
-                    var deviceInterfacesDiv = creator.createDeviceInterfaces();
-                    deviceContainer.appendChild(deviceBasic);
-                    deviceContainer.appendChild(deviceInterfacesDiv);
-
+                    var deviceContainer = creator.createDevice();
                     allDevicesContainer.appendChild(deviceContainer);
                 }
             }
@@ -72,7 +62,7 @@ function getAllDevices() {
 
 function addDevice(event) {
     event.preventDefault();
-   
+
     var form = $(event.target).closest("form")[0];
     var device = form.device.value;
     var name = form.name.value;
@@ -81,7 +71,7 @@ function addDevice(event) {
     if (fabricatorList != undefined) {
         fabricator = fabricatorList.value;
     }
-    
+
     var formInfo = { Device: device, Name: name, Fabricator: fabricator };
 
     $.ajax({
@@ -97,27 +87,16 @@ function addDevice(event) {
     closeAllDialogs();
 }
 
-function test() {
-    var id = prompt("Enter device id", "");
-    if (id == null) {
-        return;
-    }
+function reloadDevice(id) {
     $.ajax({
         url: "/api/SmartHouse/" + id,
         type: "GET",
         success: function (data) {
             if (data != null) {
-                var deviceContainer = document.createElement("div");
-                deviceContainer.classList.add("device-container");
-
                 var creator = new DeviceCreator(data.Id, data.Device, data.DeviceType, data.Interfaces);
-                var deviceBasic = creator.createDeviceBasic();
-                var deviceInterfacesDiv = creator.createDeviceInterfaces();
-                deviceContainer.appendChild(deviceBasic);
-                deviceContainer.appendChild(deviceInterfacesDiv);
-
-                allDevicesContainer.appendChild(deviceContainer);
-                //alert(data);
+                var newDevice = creator.createDevice();
+                var device = document.getElementById("device-" + id);
+                allDevicesContainer.replaceChild(newDevice, device);
             } else {
                 alert("Data is null :(");
             }
@@ -130,27 +109,46 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
     //this.device = device;
     //this.type = type;
     //this.deviceInterfaces = deviceInterfaces;
+    this.createDevice = function () {
+        var deviceContainer = document.createElement("div");
+        deviceContainer.classList.add("device-container");
+        deviceContainer.id = "device-" + id;
 
-    this.createDeviceBasic = function () {
+        var deviceBasic = createDeviceBasic();
+        var deviceInterfacesDiv = createDeviceInterfaces();
+
+        deviceContainer.appendChild(deviceBasic);
+        deviceContainer.appendChild(deviceInterfacesDiv);
+        return deviceContainer;
+    }
+
+    var createDeviceBasic = function () {
         var deviceBasic = document.createElement("div");
         deviceBasic.classList.add("device-basic");
 
         var deviceControlDiv = document.createElement("div");
         deviceControlDiv.classList.add("device-control");
 
-        var toogleButton = document.createElement("a");
-        toogleButton.href = "/Home/ToogleDevice?id=" + id;
-        var isOnImage = document.createElement("img");
+        var toogleButton = document.createElement("input");
+        toogleButton.type = "image";
         if (device.IsOn) {
-            isOnImage.src = images.on;
-            isOnImage.alt = "Turn off";
+            toogleButton.src = images.on;
+            toogleButton.alt = "Turn off";
+        } else {
+            toogleButton.src = images.off;
+            toogleButton.alt = "Turn on";
         }
-        else {
-            isOnImage.src = images.off;
-            isOnImage.alt = "Turn on";
+        toogleButton.classList.add("toogle-button");
+        toogleButton.onclick = function() {
+            $.ajax({
+                url: "/api/SmartHouse/ToogleDevice/" + id,
+                data: { "": "" },
+                type: "PUT",
+                success: function () {
+                    reloadDevice(id);
+                }
+            });
         }
-        isOnImage.classList.add("toogle-button");
-        toogleButton.appendChild(isOnImage);
 
         var renameButton = document.createElement("input");
         renameButton.type = "image";
@@ -159,16 +157,26 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
         renameButton.title = "Rename device";
         renameButton.classList.add("rename-button");
         renameButton.onclick = function (id, name) {
-            return function () { rename(id, name); }
+            return function () {
+                rename(id, name);
+            }
         }(id, device.Name);
 
-        var removeButton = document.createElement("a");
-        removeButton.href = "/Home/RemoveDevice?id=" + id;
-        var removeImage = document.createElement("img");
-        removeImage.src = images.remove;
-        removeImage.alt = "Remove";
-        removeImage.classList.add("remove-button");
-        removeButton.appendChild(removeImage);
+        var removeButton = document.createElement("input");
+        removeButton.type = "image";
+        removeButton.src = images.remove;
+        removeButton.alt = "Remove";
+        removeButton.classList.add("remove-button");
+        removeButton.onclick = function (event) {
+            $.ajax({
+                url: "/api/SmartHouse?id=" + id,
+                type: "DELETE",
+                success: function () {
+                    var device = $(event.target).closest(".device-container")[0];
+                    allDevicesContainer.removeChild(device);
+                }
+            });
+        }
 
         deviceControlDiv.appendChild(toogleButton);
         deviceControlDiv.appendChild(renameButton);
@@ -209,7 +217,7 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
         return deviceBasic;
     }
 
-    this.createDeviceInterfaces = function () {
+    var createDeviceInterfaces = function () {
         var deviceInterfacesDiv = document.createElement("div");
         deviceInterfacesDiv.classList.add("device-interfaces");
 
@@ -341,20 +349,27 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
 
     // IOpenable
     var createIOpenable = function () {
-        var image = document.createElement("img");
+        var button = document.createElement("input");
+        button.type = "image";
         if (device.IsOpen) {
-            image.src = images.opened;
-            image.alt = "Close";
+            button.src = images.opened;
+            button.alt = "Close";
         } else {
-            image.src = images.closed;
-            image.alt = "Open";
+            button.src = images.closed;
+            button.alt = "Open";
+        }
+        button.onclick = function() {
+            $.ajax({
+                url: "/api/SmartHouse/ToogleDoor/" + id,
+                data: { "": "" },
+                type: "PUT",
+                success: function () {
+                    reloadDevice(id);
+                }
+            });
         }
 
-        var link = document.createElement("a");
-        link.href = "/Home/ToogleDoor?id=" + id;
-        link.appendChild(image);
-
-        return link;
+        return button;
     }
 
     // ITemperature
@@ -500,7 +515,7 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
             ibacklight.imgAlt = "Backlight is off";
         }
         ibacklight.lampPower = device.ColdstoreLampPower;
-        
+
         var itemperature = {};
         itemperature.formAction = "/Home/SetColdstoreTemperature?id=" + id;
         itemperature.min = device.ColdstoreMinTemperature;
@@ -543,7 +558,7 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
         fridgeDiv.appendChild(freezer);
         return fridgeDiv;
     }
-    
+
     var createFridgeModule = function (params) {
         var className = params.className;
         var iopenable = params.iopenable;
@@ -580,7 +595,7 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
 
             divTop.appendChild(iBacklightImg);
         }
-        
+
         if (ivolume != undefined) {
             var iVolumeDiv = document.createElement("div");
             iVolumeDiv.classList.add("ivolume");

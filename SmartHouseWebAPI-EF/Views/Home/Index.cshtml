@@ -42,8 +42,7 @@
     // .js_DynamicClockDiv
     // .js_Timestamp
 
-        -->
-
+    -->
     <div>
         <div class="add-device-panel">
             @CreateDevicePanelItem("../../Content/Images/clock.png", "clock-dialog")
@@ -348,7 +347,7 @@
 
 @helper CreateDeviceDialog(string dialogId, string device, string[] items = null)
 {
-    <div id="@dialogId" class="hidden js_Dialog">
+    <div id="@dialogId" class="hidden">
         @using (Html.BeginForm("AddDevice", "Home", FormMethod.Post))
         {
             @Html.TextBox("name", null, new { autocomplete = "off" })
@@ -362,7 +361,7 @@
                     }
                 </select>
             }
-            <input type="submit" value="Ок" onclick="addDevice(event);"/>
+            <input type="submit" value="Ок" onclick="addDevice(event);" />
         }
     </div>
 }
@@ -373,8 +372,7 @@
         @using (Html.BeginForm("RenameDevice", "Home", FormMethod.Post))
         {
             @Html.TextBox("newName", null, new { autocomplete = "off" })
-            <input type="hidden" id="renameId" name="id" />
-            <input type="submit" value="Ok" />
+            <input type="submit" id="rename-button" value="Ok" />
         }
     </div>
 }

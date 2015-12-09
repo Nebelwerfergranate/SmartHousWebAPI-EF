@@ -51,8 +51,6 @@ namespace SmartHouseWebAPI_EF.Controllers
             {
                 return;
             }
-
-
             switch (value.Device)
             {
                 case "clock":
@@ -71,13 +69,58 @@ namespace SmartHouseWebAPI_EF.Controllers
         }
 
         // PUT: api/SmartHouse/5
-        public void Put(int id, [FromBody]string value)
+        [HttpPut]
+        [Route("api/SmartHouse/RenameDevice/{id}")]
+        public void Put(uint id, [FromBody]string value)
         {
+            if (value == null)
+            {
+                value = "";
+            }
+            deviceManager.RenameById(id, value);
+        }
+
+        [HttpPut]
+        [Route("api/SmartHouse/ToogleDevice/{id}")]
+        public void ToogleDevice(uint id, [FromBody] string value)
+        {
+            Device device = deviceManager.GetDeviceById(id);
+            if (device != null)
+            {
+                if (device.IsOn)
+                {
+                    device.TurnOff();
+                }
+                else
+                {
+                    device.TurnOn();
+                }
+            }
+        }
+
+        [HttpPut]
+        [Route("api/SmartHouse/ToogleDoor/{id}")]
+        public void ToogleDoor(uint id, [FromBody] string value)
+        {
+            Device device = deviceManager.GetDeviceById(id);
+            if (device != null)
+            {
+                IOpenable door = (IOpenable) device;
+                if (door.IsOpen)
+                {
+                    door.Close();
+                }
+                else
+                {
+                    door.Open();
+                }
+            }
         }
 
         // DELETE: api/SmartHouse/5
-        public void Delete(int id)
+        public void Delete(uint id)
         {
+            deviceManager.RemoveById(id);
         }
     }
 }
