@@ -149,7 +149,8 @@ body input[type="submit"] {
         padding: 5px;
     }
         /* IBacklight IOpenable */
-        .device-container > .device-interfaces .device-interfaces-small img {
+        .device-container > .device-interfaces .device-interfaces-small img,
+        .device-container > .device-interfaces .device-interfaces-small input[type="image"] {
             position: relative;
             margin-top: 5px;
             margin-left: 66px;

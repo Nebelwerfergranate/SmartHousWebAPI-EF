@@ -87,6 +87,33 @@ function addDevice(event) {
     closeAllDialogs();
 }
 
+function renameDevice(id, oldName) {
+    if (oldName == undefined) {
+        oldName = "";
+    }
+    closeAllDialogs();
+    var newNameField = document.getElementById("newName");
+    newNameField.value = oldName;
+    $("#rename-dialog").dialog('open');
+    newNameField.select();
+
+    var renameButton = document.getElementById("rename-button");
+    renameButton.onclick = function (event) {
+        event.preventDefault();
+        $.ajax({
+            url: "/api/SmartHouse/RenameDevice/" + id,
+            data: { "": newNameField.value },
+            type: "PUT",
+            success: function () {
+                var device = document.getElementById("device-" + id);
+                var span = device.getElementsByClassName("device-name-label")[0];
+                $(span).text(newNameField.value);
+                closeAllDialogs();
+            }
+        });
+    }
+}
+
 function reloadDevice(id) {
     $.ajax({
         url: "/api/SmartHouse/" + id,
@@ -163,7 +190,7 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
         renameButton.classList.add("rename-button");
         renameButton.onclick = function (id, name) {
             return function () {
-                rename(id, name);
+                renameDevice(id, name);
             }
         }(id, device.Name);
 
@@ -584,7 +611,7 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
 
         // Coldstore
         var iopenable = {};
-        iopenable.command = "/Home/ToogleColdstoreDoor?id=" + id;
+        iopenable.url = "/api/SmartHouse/ToogleColdstoreDoor/" + id;
         if (device.ColdstoreIsOpen) {
             iopenable.imgSrc = images.opened;
             iopenable.imgAlt = "Close";
@@ -604,7 +631,7 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
         ibacklight.lampPower = device.ColdstoreLampPower;
 
         var itemperature = {};
-        itemperature.formAction = "/Home/SetColdstoreTemperature?id=" + id;
+        itemperature.url = "/api/SmartHouse/SetColdstoreTemperature/" + id;
         itemperature.min = device.ColdstoreMinTemperature;
         itemperature.max = device.ColdstoreMaxTemperature;
         itemperature.value = device.ColdstoreTemperature;
@@ -619,7 +646,7 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
 
         // Freezer
         iopenable = {};
-        iopenable.command = "/Home/ToogleFreezerDoor?id=" + id;
+        iopenable.url = "/api/SmartHouse/ToogleFreezerDoor/" + id;
         if (device.FreezerIsOpen) {
             iopenable.imgSrc = images.opened;
             iopenable.imgAlt = "Close";
@@ -629,7 +656,7 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
         }
 
         itemperature = {};
-        itemperature.formAction = "/Home/SetFreezerTemperature?id=" + id;
+        itemperature.url = "/api/SmartHouse/SetFreezerTemperature/" + id;
         itemperature.min = device.FreezerMinTemperature;
         itemperature.max = device.FreezerMaxTemperature;
         itemperature.value = device.FreezerTemperature;
@@ -662,15 +689,21 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
         var divTop = document.createElement("div");
 
         if (iopenable != undefined) {
-            var link = document.createElement("a");
-            link.href = iopenable.command;
-
-            var iOpenableImg = document.createElement("img");
-            iOpenableImg.src = iopenable.imgSrc;
-            iOpenableImg.alt = iopenable.imgAlt;
-
-            link.appendChild(iOpenableImg);
-            divTop.appendChild(link);
+            var button = document.createElement("input");
+            button.type = "image";
+            button.src = iopenable.imgSrc;
+            button.alt = iopenable.imgAlt;
+            button.onclick = function () {
+                $.ajax({
+                    url: iopenable.url,
+                    data: { "": "" },
+                    type: "PUT",
+                    success: function () {
+                        reloadDevice(id);
+                    }
+                });
+            }
+            divTop.appendChild(button);
         }
         smallInterfaces.appendChild(divTop);
 
@@ -697,11 +730,10 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
         fridgeModule.appendChild(smallInterfaces);
 
         if (itemperature != undefined) {
-            var itemperatureDiv = document.createElement("div");
-            itemperatureDiv.classList.add("itemperature");
+            var iTemperatureDiv = document.createElement("div");
+            iTemperatureDiv.classList.add("itemperature");
 
             var form = document.createElement("form");
-            form.action = itemperature.formAction;
             form.method = "POST";
 
             var temperature = document.createElement("input");
@@ -717,12 +749,27 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
             var submit = document.createElement("input");
             submit.type = "submit";
             submit.value = "Set Temperature";
+            form.onsubmit = form.onsubmit = function (event) {
+                event.preventDefault();
+                if (!form.checkValidity()) {
+                    return;
+                }
+                $.ajax({
+                    url: itemperature.url,
+                    data: { "": temperature.value },
+                    type: "PUT",
+                    success: function () {
+                        reloadDevice(id);
+                    }
+                });
+            }
 
             form.appendChild(temperature);
             form.appendChild(submit);
 
-            itemperatureDiv.appendChild(form);
-            fridgeModule.appendChild(itemperatureDiv);
+            iTemperatureDiv.appendChild(form);
+            iTemperatureDiv.appendChild(form);
+            fridgeModule.appendChild(iTemperatureDiv);
         }
 
         return fridgeModule;
