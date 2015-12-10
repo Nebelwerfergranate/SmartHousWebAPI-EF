@@ -252,7 +252,8 @@ body input[type="submit"] {
                 width: 90px;
             }
 
-            .device-container > .device-interfaces .itimer img {
+            .device-container > .device-interfaces .itimer img,
+            .device-container > .device-interfaces .itimer input[type="image"] {
                 position: absolute;
                 top: 50px;
                 left: 135px;

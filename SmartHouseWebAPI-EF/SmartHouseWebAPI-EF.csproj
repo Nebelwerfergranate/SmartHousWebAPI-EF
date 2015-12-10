@@ -108,6 +108,7 @@
     <Content Include="Content\Images\rename.png" />
     <Content Include="Content\Images\start.png" />
     <Content Include="Content\Images\stop.png" />
+    <Content Include="Content\Sounds\bell.mp3" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\api-script.js" />
     <Content Include="Scripts\jquery-2.1.4.min.js" />
@@ -131,6 +132,7 @@
     <Compile Include="Models\DeviceManager\NewDeviceInfo.cs" />
     <Compile Include="Models\DeviceManager\OvenInfo.cs" />
     <Compile Include="Models\DeviceManager\SessionDeviceManager.cs" />
+    <Compile Include="Models\DeviceManager\TimeInfo.cs" />
     <Compile Include="Models\SmartHouse\Delegates\OperationDelegate.cs" />
     <Compile Include="Models\SmartHouse\Devices\Clock.cs" />
     <Compile Include="Models\SmartHouse\Devices\Coldstore.cs" />

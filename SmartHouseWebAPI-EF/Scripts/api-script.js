@@ -35,11 +35,11 @@ var interfaces = {
     iVolume: "SmartHouse.IVolume"
 }
 
-var allDevicesContainer;
+var allDevicesContainer = null;
 
 $(document).ready(function () {
     allDevicesContainer = document.getElementById("all-devices-container");
-   
+
     getAllDevices();
 });
 
@@ -109,6 +109,8 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
     //this.device = device;
     //this.type = type;
     //this.deviceInterfaces = deviceInterfaces;
+    var timer = null;
+
     this.createDevice = function () {
         var deviceContainer = document.createElement("div");
         deviceContainer.classList.add("device-container");
@@ -139,7 +141,10 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
             toogleButton.alt = "Turn on";
         }
         toogleButton.classList.add("toogle-button");
-        toogleButton.onclick = function() {
+        toogleButton.onclick = function () {
+            if (timer != null) {
+                clearInterval(timer);
+            }
             $.ajax({
                 url: "/api/SmartHouse/ToogleDevice/" + id,
                 data: { "": "" },
@@ -332,6 +337,25 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
             var submit = document.createElement("input");
             submit.type = "submit";
             submit.value = "Set Time";
+            form.onsubmit = function (event) {
+                event.preventDefault();
+                if (!form.checkValidity()) {
+                    return;
+                }
+                var formInfo = {
+                    hours: form.hours.value,
+                    minutes: form.minutes.value
+                }
+                $.ajax({
+                    url: "/api/SmartHouse/SetTime/" + id,
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify(formInfo),
+                    type: "PUT",
+                    success: function () {
+                        reloadDevice(id);
+                    }
+                });
+            }
 
             form.appendChild(hours);
             form.appendChild(separator);
@@ -358,7 +382,7 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
             button.src = images.closed;
             button.alt = "Open";
         }
-        button.onclick = function() {
+        button.onclick = function () {
             $.ajax({
                 url: "/api/SmartHouse/ToogleDoor/" + id,
                 data: { "": "" },
@@ -394,6 +418,20 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
         var submit = document.createElement("input");
         submit.type = "submit";
         submit.value = "Set Temperature";
+        form.onsubmit = form.onsubmit = function (event) {
+            event.preventDefault();
+            if (!form.checkValidity()) {
+                return;
+            }
+            $.ajax({
+                url: "/api/SmartHouse/SetTemperature/" + id,
+                data: { "": temperature.value },
+                type: "PUT",
+                success: function () {
+                    reloadDevice(id);
+                }
+            });
+        }
 
         form.appendChild(temperature);
         form.appendChild(submit);
@@ -449,6 +487,28 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
             var submit = document.createElement("input");
             submit.type = "submit";
             submit.value = "Set Timer";
+            form.onsubmit = function (event) {
+                event.preventDefault();
+                if (!form.checkValidity()) {
+                    return;
+                }
+                var formInfo = {};
+                formInfo.seconds = form.seconds.value;
+                formInfo.minutes = form.minutes.value;
+                if (form.hours != undefined) {
+                    formInfo.hours = form.hours.value;
+                }
+                $.ajax({
+                    url: "/api/SmartHouse/TimerSet/" + id,
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify(formInfo),
+                    type: "PUT",
+                    success: function () {
+                        reloadDevice(id);
+                    }
+                });
+            }
+
 
             form.appendChild(minutes);
             form.appendChild(msSeparator);
@@ -457,22 +517,49 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
 
             iTimerDiv.appendChild(form);
 
-            var link = document.createElement("a");
-            link.href = "/Home/ToogleTimer?id=" + id;
-
-            var image = document.createElement("img");
+            var button = document.createElement("input");
+            button.type = "image";
             if (device.IsRunning) {
-                image.src = images.stop;
-                image.alt = "Running";
+                button.src = images.stop;
+                button.alt = "Running";
             } else {
-                image.src = images.start;
-                image.alt = "Not running";
-                image.title = "Don't forget to set the timer";
+                button.src = images.start;
+                button.alt = "Not running";
+                button.title = "Don't forget to set the timer";
+            }
+            button.onclick = function () {
+                clearInterval(timer);
+                $.ajax({
+                    url: "/api/SmartHouse/ToogleTimer/" + id,
+                    data: { "": "" },
+                    type: "PUT",
+                    success: function () {
+                        reloadDevice(id);
+                    }
+                });
+            }
+           
+            if (device.IsRunning) {
+                timer = setInterval(function () {
+                    $.ajax({
+                        url: "/api/SmartHouse/IsRunning/" + id,
+                        type: "GET",
+                        success: function (data) {
+                            if (data != null) {
+                                if (data === false) {
+                                    clearInterval(timer);
+                                    if (device.IsRunning) {
+                                        document.getElementById("bell").play();
+                                    }
+                                    reloadDevice(id);
+                                }
+                            }
+                        }
+                    });
+                }, 2000);
             }
 
-            link.appendChild(image);
-
-            iTimerDiv.appendChild(link);
+            iTimerDiv.appendChild(button);
         }
 
         return iTimerDiv;

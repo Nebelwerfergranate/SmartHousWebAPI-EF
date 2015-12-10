@@ -42,7 +42,7 @@ function rename(id, oldName) {
         event.preventDefault();
         $.ajax({
             url: "/api/SmartHouse/RenameDevice/" + id,
-            data: { "": document.getElementById("newName").value },
+            data: { "": newNameField.value },
             type: "PUT",
             success: function () {
                 var device = document.getElementById("device-" + id);
