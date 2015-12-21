@@ -6,17 +6,17 @@ using SmartHouse;
 
 namespace SmartHouseWF.Models.DeviceManager
 {
-    public class MicrowaveInfo
+    public class MicrowaveFabricatorInfo
     {
         public Lamp Lamp { get; set; }
         public int Volume { get; set; }
 
-        public MicrowaveInfo()
+        public MicrowaveFabricatorInfo()
         {
             
         }
 
-        public MicrowaveInfo(int volume, Lamp lamp)
+        public MicrowaveFabricatorInfo(int volume, Lamp lamp)
         {
             Lamp = lamp;
             Volume = volume;

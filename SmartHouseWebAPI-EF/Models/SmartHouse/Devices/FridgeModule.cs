@@ -3,7 +3,7 @@
     public abstract class FridgeModule : Device, IOpenable, ITemperature, IVolume
     {
         // Fields
-        protected readonly double volume;
+        protected double volume;
 
         protected bool isOpen;
 
@@ -11,6 +11,7 @@
 
 
         // Constructors
+        protected FridgeModule() { }
         protected FridgeModule(string name, uint volume) : base(name)
         {
             if (volume < 10)
@@ -28,6 +29,7 @@
         public bool IsOpen
         {
             get { return isOpen; }
+            set { isOpen = value; }
         }
 
         public abstract double Temperature
@@ -38,6 +40,7 @@
         public double Volume
         {
             get { return volume; }
+            set { volume = value; }
         }
 
 

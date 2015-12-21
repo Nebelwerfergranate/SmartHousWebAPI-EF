@@ -1,75 +1,113 @@
-﻿namespace SmartHouse
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SmartHouse
 {
     public class Fridge : Device
     {
         // Fields
-        private readonly Coldstore coldstore;
-        private readonly Freezer freezer;
-
 
         // Constructors
-        public Fridge(string name, Coldstore coldstore, Freezer freezer) : base(name)
+        public Fridge()
         {
-            this.coldstore = coldstore;
-            this.freezer = freezer;
+            Coldstore = new Coldstore();
+            Freezer = new Freezer();
+        }
+        public Fridge(string name, Coldstore coldstore, Freezer freezer)
+            : base(name)
+        {
+            this.Coldstore = coldstore;
+            this.Freezer = freezer;
         }
 
 
         // Properties
+        public override bool IsOn
+        {
+            get { return isOn; }
+            set
+            {
+                isOn = value;
+                if (value)
+                {
+                    Coldstore.TurnOn();
+                    Freezer.TurnOn();
+                }
+            }
+        }
+
+        [NotMapped]
+        public Coldstore Coldstore { get; set; }
+
+        [NotMapped]
+        public Freezer Freezer { get; set; }
+
+
         public bool ColdstoreIsOpen
         {
-            get { return coldstore.IsOpen; }
+            get { return Coldstore.IsOpen; }
+            set { Coldstore.IsOpen = value; }
         }
+
         public double ColdstoreTemperature
         {
-            get { return coldstore.Temperature; }
-            set { coldstore.Temperature = value; }
+            get { return Coldstore.Temperature; }
+            set { Coldstore.Temperature = value; }
         }
-
+        [NotMapped]
         public double ColdstoreMinTemperature
         {
-            get { return coldstore.MinTemperature; }
+            get { return Coldstore.MinTemperature; }
         }
-
+        [NotMapped]
         public double ColdstoreMaxTemperature
         {
-            get { return coldstore.MaxTemperature; }
+            get { return Coldstore.MaxTemperature; }
         }
+
         public bool ColdstoreIsHighlighted
         {
-            get { return coldstore.IsHighlighted; }
+            get { return Coldstore.IsHighlighted; }
+            set { Coldstore.IsHighlighted = value; }
         }
+
         public double ColdstoreLampPower
         {
-            get { return coldstore.LampPower; }
+            get { return Coldstore.LampPower; }
+            set { Coldstore.LampPower = value; }
         }
+
         public double ColdstoreVolume
         {
-            get { return coldstore.Volume; }
+            get { return Coldstore.Volume; }
+            set { Coldstore.Volume = value; }
         }
 
         public bool FreezerIsOpen
         {
-            get { return freezer.IsOpen; }
+            get { return Freezer.IsOpen; }
+            set { Freezer.IsOpen = value; }
         }
+
         public double FreezerTemperature
         {
-            get { return freezer.Temperature; }
-            set { freezer.Temperature = value; }
+            get { return Freezer.Temperature; }
+            set { Freezer.Temperature = value; }
         }
-
+        [NotMapped]
         public double FreezerMinTemperature
         {
-            get { return freezer.MinTemperature; }
+            get { return Freezer.MinTemperature; }
         }
-
+        [NotMapped]
         public double FreezerMaxTemperature
         {
-            get { return freezer.MaxTemperature; }
+            get { return Freezer.MaxTemperature; }
         }
+
         public double FreezerVolume
         {
-            get { return freezer.Volume; }
+            get { return Freezer.Volume; }
+            set { Freezer.Volume = value; }
         }
 
 
@@ -77,31 +115,31 @@
         public override void TurnOn()
         {
             base.TurnOn();
-            coldstore.TurnOn();
-            freezer.TurnOn();
+            Coldstore.TurnOn();
+            Freezer.TurnOn();
         }
         public override void TurnOff()
         {
             base.TurnOff();
-            coldstore.TurnOff();
-            freezer.TurnOff();
+            Coldstore.TurnOff();
+            Freezer.TurnOff();
         }
 
         public void OpenColdstore()
         {
-            coldstore.Open();
+            Coldstore.Open();
         }
         public void CloseColdstore()
         {
-            coldstore.Close();
+            Coldstore.Close();
         }
         public void OpenFreezer()
         {
-            freezer.Open();
+            Freezer.Open();
         }
         public void CloseFreezer()
         {
-            freezer.Close();
+            Freezer.Close();
         }
     }
 }

@@ -253,11 +253,22 @@ body input[type="submit"] {
                 width: 90px;
             }
 
-            .device-container > .device-interfaces .itimer img,
-            .device-container > .device-interfaces .itimer input[type="image"] {
+            .device-container > .device-interfaces .itimer .itimer-middle-button {
                 position: absolute;
                 top: 50px;
                 left: 135px;
+            }
+
+            .device-container > .device-interfaces .itimer .itimer-left-button {
+                position: absolute;
+                left: 80px;
+                top: 50px;
+            }
+
+            .device-container > .device-interfaces .itimer .itimer-right-button {
+                position: absolute;
+                right: 80px;
+                top: 50px;
             }
 
 .hidden {

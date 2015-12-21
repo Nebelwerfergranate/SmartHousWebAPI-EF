@@ -38,6 +38,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Web.DynamicData" />
@@ -104,6 +112,7 @@
     <Content Include="Content\Images\on.png" />
     <Content Include="Content\Images\opened.png" />
     <Content Include="Content\Images\oven.png" />
+    <Content Include="Content\Images\pause.png" />
     <Content Include="Content\Images\remove.png" />
     <Content Include="Content\Images\rename.png" />
     <Content Include="Content\Images\start.png" />
@@ -126,14 +135,16 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Contexts\DeviceContext.cs" />
+    <Compile Include="Models\Contexts\DeviceContextInitializer.cs" />
+    <Compile Include="Models\DeviceManager\DatabaseDeviceManager.cs" />
+    <Compile Include="Models\DeviceManager\DatabaseMapping.cs" />
     <Compile Include="Models\DeviceManager\DeviceWrapper.cs" />
-    <Compile Include="Models\DeviceManager\FridgeInfo.cs" />
-    <Compile Include="Models\DeviceManager\MicrowaveInfo.cs" />
+    <Compile Include="Models\DeviceManager\FridgeFabricatorInfo.cs" />
+    <Compile Include="Models\DeviceManager\MicrowaveFabricatorInfo.cs" />
     <Compile Include="Models\DeviceManager\NewDeviceInfo.cs" />
-    <Compile Include="Models\DeviceManager\OvenInfo.cs" />
-    <Compile Include="Models\DeviceManager\SessionDeviceManager.cs" />
+    <Compile Include="Models\DeviceManager\OvenFabricatorInfo.cs" />
     <Compile Include="Models\DeviceManager\TimeInfo.cs" />
-    <Compile Include="Models\SmartHouse\Delegates\OperationDelegate.cs" />
     <Compile Include="Models\SmartHouse\Devices\Clock.cs" />
     <Compile Include="Models\SmartHouse\Devices\Coldstore.cs" />
     <Compile Include="Models\SmartHouse\Devices\Device.cs" />

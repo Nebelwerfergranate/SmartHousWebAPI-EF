@@ -7,17 +7,17 @@ using SmartHouse;
 
 namespace SmartHouseWF.Models.DeviceManager
 {
-    public class OvenInfo
+    public class OvenFabricatorInfo
     {
         public Lamp Lamp { get; set; }
         public int Volume { get; set; }
 
-        public OvenInfo()
+        public OvenFabricatorInfo()
         {
             
         }
 
-        public OvenInfo(int volume, Lamp lamp)
+        public OvenFabricatorInfo(int volume, Lamp lamp)
         {
             Lamp = lamp;
             Volume = volume;

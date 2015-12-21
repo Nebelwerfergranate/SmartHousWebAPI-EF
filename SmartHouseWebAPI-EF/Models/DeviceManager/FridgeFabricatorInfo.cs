@@ -6,14 +6,14 @@ using SmartHouse;
 
 namespace SmartHouseWF.Models.DeviceManager
 {
-    public class FridgeInfo
+    public class FridgeFabricatorInfo
     {
         // Constructors
-        public FridgeInfo()
+        public FridgeFabricatorInfo()
         {
 
         }
-        public FridgeInfo(Coldstore coldstore, Freezer freezer)
+        public FridgeFabricatorInfo(Coldstore coldstore, Freezer freezer)
         {
             Coldstore = coldstore;
             Freezer = freezer;

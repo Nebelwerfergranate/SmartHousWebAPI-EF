@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using SmartHouse;
+using SmartHouseMVC.Models.DeviceManager;
 using SmartHouseWF.Models.DeviceManager;
 
 namespace SmartHouseMVC.Controllers
@@ -11,7 +12,7 @@ namespace SmartHouseMVC.Controllers
     public class HomeController : Controller
     {
         // Fields
-        private SessionDeviceManager deviceManager = new SessionDeviceManager();
+        private DatabaseDeviceManager deviceManager = new DatabaseDeviceManager();
 
         // GET: Home
         public ActionResult Index()

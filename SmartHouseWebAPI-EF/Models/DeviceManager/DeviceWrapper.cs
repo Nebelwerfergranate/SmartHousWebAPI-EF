@@ -20,7 +20,7 @@ namespace SmartHouseWebAPI_EF.Models.DeviceManager
             Device = device;
         }
 
-        public DeviceWrapper(Device device, uint id)
+        public DeviceWrapper(Device device, int id)
         {
             Device = device;
             Id = id;
@@ -57,6 +57,6 @@ namespace SmartHouseWebAPI_EF.Models.DeviceManager
             get { return interfaces; }
             private set { interfaces = value; }
         }
-        public uint Id { get; set; }
+        public int Id { get; set; }
     }
 }

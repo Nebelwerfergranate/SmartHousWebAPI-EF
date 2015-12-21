@@ -16,6 +16,7 @@
     closed: "/Content/Images/closed.png",
     // ITimer
     start: "/Content/Images/start.png",
+    pause: "/Content/Images/pause.png",
     stop: "/Content/Images/stop.png"
 }
 
@@ -544,49 +545,76 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
 
             iTimerDiv.appendChild(form);
 
-            var button = document.createElement("input");
-            button.type = "image";
             if (device.IsRunning) {
-                button.src = images.stop;
-                button.alt = "Running";
-            } else {
-                button.src = images.start;
-                button.alt = "Not running";
-                button.title = "Don't forget to set the timer";
-            }
-            button.onclick = function () {
-                clearInterval(timer);
-                $.ajax({
-                    url: "/api/SmartHouse/ToogleTimer/" + id,
-                    data: { "": "" },
-                    type: "PUT",
-                    success: function () {
-                        reloadDevice(id);
-                    }
-                });
-            }
-           
-            if (device.IsRunning) {
-                timer = setInterval(function () {
+                var pauseButton = document.createElement("input");
+                pauseButton.type = "image";
+                pauseButton.src = images.pause;
+                pauseButton.alt = "Pause";
+                pauseButton.classList.add("itimer-left-button");
+
+                pauseButton.onclick = function () {
+                    clearInterval(timer);
                     $.ajax({
-                        url: "/api/SmartHouse/IsRunning/" + id,
-                        type: "GET",
-                        success: function (data) {
-                            if (data != null) {
-                                if (data === false) {
-                                    clearInterval(timer);
-                                    if (device.IsRunning) {
-                                        document.getElementById("bell").play();
-                                    }
-                                    reloadDevice(id);
-                                }
-                            }
+                        url: "/api/SmartHouse/PauseTimer/" + id,
+                        data: { "": "" },
+                        type: "PUT",
+                        success: function () {
+                            reloadDevice(id);
                         }
                     });
-                }, 2000);
+                }
+                iTimerDiv.appendChild(pauseButton);
+
+                var stopButton = document.createElement("input");
+                stopButton.type = "image";
+                stopButton.src = images.stop;
+                stopButton.alt = "Stop";
+                stopButton.classList.add("itimer-right-button");
+
+                stopButton.onclick = function () {
+                    clearInterval(timer);
+                    $.ajax({
+                        url: "/api/SmartHouse/StopTimer/" + id,
+                        data: { "": "" },
+                        type: "PUT",
+                        success: function () {
+                            reloadDevice(id);
+                        }
+                    });
+                }
+
+                iTimerDiv.appendChild(stopButton);
+            } else {
+                var startButton = document.createElement("input");
+                startButton.type = "image";
+                startButton.src = images.start;
+                startButton.alt = "Start";
+                startButton.title = "Don't forget to set the timer";
+                startButton.classList.add("itimer-middle-button");
+
+                startButton.onclick = function () {
+                    clearInterval(timer);
+                    $.ajax({
+                        url: "/api/SmartHouse/StartTimer/" + id,
+                        data: { "": "" },
+                        type: "PUT",
+                        success: function () {
+                            reloadDevice(id);
+                        }
+                    });
+                }
+
+                iTimerDiv.appendChild(startButton);
             }
 
-            iTimerDiv.appendChild(button);
+            var remainTime = new Date(device.ElapsedTime).getTime() - new Date().getTime();
+            
+            if (device.IsRunning) {
+                timer = setTimeout(function () {
+                    document.getElementById("bell").play();
+                    reloadDevice(id);
+                }, remainTime);
+            }
         }
 
         return iTimerDiv;

@@ -9,6 +9,10 @@
 
 
         // Constructors
+        public Coldstore()
+        {
+            backlight = new Lamp();
+        }
         public Coldstore(uint volume, Lamp lamp)
             : base("coldstore", volume)
         {
@@ -42,10 +46,12 @@
         public double LampPower
         {
             get { return backlight.Power; }
+            set { backlight.Power = value; }
         }
         public bool IsHighlighted
         {
             get { return backlight.IsOn; }
+            set { backlight.IsOn = value; }
         }
 
 

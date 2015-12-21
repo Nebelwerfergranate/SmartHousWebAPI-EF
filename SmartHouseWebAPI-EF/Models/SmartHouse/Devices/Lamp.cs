@@ -4,24 +4,27 @@
     {
         // Fields
         // Лампочки с нулевой мощностью не смогут подсвечивать.
-        private readonly double power = 1;
+        //private double power = 1;
 
 
         // Constructors
+        public Lamp() { }
         public Lamp(double power)
             : base("lamp")
         {
             if (power > 1)
             {
-                this.power = power;
+                this.Power = power;
             }
         }
 
 
         // Properties
-        public double Power
-        {
-            get { return power; }
-        }
+        //public double Power
+        //{
+        //    get { return power; }
+        //    set { power = value; }
+        //}
+        public double Power { get; set; }
     }
 }
