@@ -625,9 +625,6 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
 
             if (device.IsRunning) {
                 timer = setTimeout(function () {
-                    // При открытии двери микроволновки звоночек по истечении времени по какой-то причине всё-равно играет...
-                    // несмотря на то что при открытии двери девайс полностью перерисовуется. Вероятно для работы таймера наличие ссылки на него
-                    // не обязательно. Дополнительная проверка решает проблему.
                     reloadDevice(id);
                     document.getElementById("bell").play();
                 }, remainTime);
