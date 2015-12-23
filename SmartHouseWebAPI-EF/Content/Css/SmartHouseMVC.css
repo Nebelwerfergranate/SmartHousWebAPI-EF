@@ -274,6 +274,13 @@ body input[type="submit"] {
 .hidden {
     display: none;
 }
+
+.spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 100;
+}
 /* jq-ui dialog */
 .ui-dialog {
     /*высота задаётся в атрибуте sytle, устанавливается при вызове $(#)dialog(), но пусть лучше будет здесь*/

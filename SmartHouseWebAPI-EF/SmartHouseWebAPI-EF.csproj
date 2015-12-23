@@ -101,6 +101,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Animations\ajax-loader.gif" />
     <Content Include="Content\Css\SmartHouseMVC.css" />
     <Content Include="Content\Images\backlightOff.png" />
     <Content Include="Content\Images\backlightOn.png" />

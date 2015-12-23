@@ -20,6 +20,10 @@
     stop: "/Content/Images/stop.png"
 }
 
+var animations = {
+    spinner: "/Content/Animations/ajax-loader.gif"
+}
+
 var types = {
     clock: "SmartHouse.Clock",
     microwave: "SmartHouse.Microwave",
@@ -48,6 +52,9 @@ function getAllDevices() {
     $.ajax({
         url: "/api/SmartHouse",
         type: "GET",
+        beforeSend: function () {
+            spinner.add();
+        },
         success: function (data) {
             if (data != null) {
                 $(allDevicesContainer).html("");
@@ -57,6 +64,7 @@ function getAllDevices() {
                     allDevicesContainer.appendChild(deviceContainer);
                 }
             }
+            spinner.remove();
         }
     });
 }
@@ -80,8 +88,11 @@ function addDevice(event) {
         contentType: "application/json;charset=utf-8",
         data: JSON.stringify(formInfo),
         type: "POST",
+        beforeSend: function () {
+            spinner.add();
+        },
         success: function () {
-
+            spinner.remove();
             getAllDevices();
         }
     });
@@ -411,6 +422,9 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
             button.alt = "Open";
         }
         button.onclick = function () {
+            if (!device.IsOpen && device.IsRunning && type == types.microwave) {
+                clearInterval(timer);
+            }
             $.ajax({
                 url: "/api/SmartHouse/ToogleDoor/" + id,
                 data: { "": "" },
@@ -608,11 +622,14 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
             }
 
             var remainTime = new Date(device.ElapsedTime).getTime() - new Date().getTime();
-            
+
             if (device.IsRunning) {
                 timer = setTimeout(function () {
-                    document.getElementById("bell").play();
+                    // При открытии двери микроволновки звоночек по истечении времени по какой-то причине всё-равно играет...
+                    // несмотря на то что при открытии двери девайс полностью перерисовуется. Вероятно для работы таймера наличие ссылки на него
+                    // не обязательно. Дополнительная проверка решает проблему.
                     reloadDevice(id);
+                    document.getElementById("bell").play();
                 }, remainTime);
             }
         }
@@ -803,3 +820,21 @@ function DeviceCreator(id, device, type, deviceInterfaces) {
         return fridgeModule;
     }
 }
+
+var spinner = {
+    add: function () {
+        $('<img></img>')
+                .attr('src', animations.spinner)
+                .attr('class', 'spinner')
+                .hide()
+                .load(function () {
+                    $(this).fadeIn();
+                })
+                .appendTo(allDevicesContainer);
+    },
+    remove: function () {
+        $('.spinner').fadeOut('slow', function () {
+            $(this).remove();
+        });
+    }
+};
